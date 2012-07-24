@@ -1,5 +1,5 @@
-#ifndef _OFX_SPHERIC_CAMERA__
-#define _OFX_SPHERIC_CAMERA__
+#ifndef _OFX_FLYING_CAMERA_
+#define _OFX_FLYING_CAMERA_
 
 #define FILE_VERSION 0.1
 
@@ -10,7 +10,7 @@ using namespace std;
 
 #include <vector>
 
-class ofxSphericCamera{
+class ofxFlyingCamera{
 
 private:
 	ofVec3f						cameraCenter;
