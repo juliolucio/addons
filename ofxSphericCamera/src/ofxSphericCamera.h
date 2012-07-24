@@ -37,6 +37,7 @@ private:
 	float						cameraBottom;
 
 	bool						haveToUpdateCamera;
+	bool						isDrawingTrihedrum;
 
 	ofFbo::Settings				cameraBufferSettings;
 	ofFbo*						frameBufferCamera;
@@ -56,6 +57,7 @@ private:
 
 	string						fileName;
 
+	void						drawTrihedrum			();
 public:
 	void						setup					( string theFileName );
 	string						load					( string theFileName );
@@ -73,6 +75,8 @@ public:
     void						setCameraRadius         ( float theRadius );
 	void						setCameraTeta           ( float theTeta );
 	void						setCameraFi             ( float theFi );
+
+	void						setDrawTrihedrum		( bool haveToisDrawTrihedrum );
      
 	void						setDeltaCameraSphericalCoordinatesRadius( float theDeltaRadius );
 	void						setDeltaCameraSphericalCoordinatesTeta	( float theDeltaTeta );

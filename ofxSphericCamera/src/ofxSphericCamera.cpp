@@ -54,6 +54,7 @@ void ofxSphericCamera::setup( string theFileName ){
 	cameraEye.z = cameraRadius * cos( cameraFi	 * ( ( 2 * PI ) / 360.0f ));
 
 	haveToUpdateCamera = true;
+	isDrawingTrihedrum = false;
 }
 //---------------------------------------------------------------------------------------------------------
 string ofxSphericCamera::load( string theFileName ){
@@ -278,83 +279,8 @@ void ofxSphericCamera::begin(){
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();	
 	gluLookAt( cameraEye.x , cameraEye.y , cameraEye.z , cameraCenter.x , cameraCenter.y , cameraCenter.z , cameraUp.x , cameraUp.y , cameraUp.z );
-			
-	ofMesh trihedrum;
-	float side = 100;
-
-	//face xy
-	trihedrum.addVertex( ofVec3f( 0 , 0 , 0 ) );
-	trihedrum.addVertex( ofVec3f( side , 0 , 0 ) );
-	trihedrum.addVertex( ofVec3f( 0 , side , 0 ) );
-	trihedrum.addVertex( ofVec3f( side , side , 0 ) );
-	
-	trihedrum.addColor( ofColor( 0 , 0 , 0 ));
-	trihedrum.addColor( ofColor( 255 , 0 , 0 ));
-	trihedrum.addColor( ofColor( 0 , 255 , 0 ));
-	trihedrum.addColor( ofColor( 255 , 255 , 0 ));
-
-	trihedrum.addNormal( ofVec3f( 0 , 0 , 1 ) );
-	trihedrum.addNormal( ofVec3f( 0 , 0 , 1 ) );
-	trihedrum.addNormal( ofVec3f( 0 , 0 , 1 ) );
-	trihedrum.addNormal( ofVec3f( 0 , 0 , 1 ) );
-
-	trihedrum.addIndex( 0 );
-	trihedrum.addIndex( 1 );
-	trihedrum.addIndex( 3 );
-
-	trihedrum.addIndex( 0 );
-	trihedrum.addIndex( 3 );
-	trihedrum.addIndex( 2 );
-
-	//face YZ
-	trihedrum.addVertex( ofVec3f( 0 , 0 , 0 ) );
-	trihedrum.addVertex( ofVec3f( 0 , side , 0 ) );
-	trihedrum.addVertex( ofVec3f( 0 , 0 ,side ) );
-	trihedrum.addVertex( ofVec3f( 0 , side , side ) );
-	
-	trihedrum.addColor( ofColor( 0 , 0 , 0 ));
-	trihedrum.addColor( ofColor( 0 , 255 , 0 ));
-	trihedrum.addColor( ofColor( 0 , 0 , 255 ));
-	trihedrum.addColor( ofColor( 0 , 255 , 255 ));
-
-	trihedrum.addNormal( ofVec3f( 1 , 0 , 0 ) );
-	trihedrum.addNormal( ofVec3f( 1 , 0 , 0 ) );
-	trihedrum.addNormal( ofVec3f( 1 , 0 , 0 ) );
-	trihedrum.addNormal( ofVec3f( 1 , 0 , 0 ) );
-
-	trihedrum.addIndex( 4 );
-	trihedrum.addIndex( 5 );
-	trihedrum.addIndex( 7 );
-
-	trihedrum.addIndex( 4 );
-	trihedrum.addIndex( 7 );
-	trihedrum.addIndex( 6 );
-
-	//face XZ
-	trihedrum.addVertex( ofVec3f( 0 , 0 , 0 ) );
-	trihedrum.addVertex( ofVec3f( side , 0 , 0 ) );
-	trihedrum.addVertex( ofVec3f( 0 , 0 ,side ) );
-	trihedrum.addVertex( ofVec3f( side , 0 , side ) );
-	
-	trihedrum.addColor( ofColor( 0 , 0 , 0 ));
-	trihedrum.addColor( ofColor( 255 , 0 , 0 ));
-	trihedrum.addColor( ofColor( 0 , 0 , 255 ));
-	trihedrum.addColor( ofColor( 255 , 0 , 255 ));
-
-	trihedrum.addNormal( ofVec3f( 0 , 1 , 0 ) );
-	trihedrum.addNormal( ofVec3f( 0 , 1 , 0 ) );
-	trihedrum.addNormal( ofVec3f( 0 , 1 , 0 ) );
-	trihedrum.addNormal( ofVec3f( 0 , 1 , 0 ) );
-
-	trihedrum.addIndex( 8 );
-	trihedrum.addIndex( 9 );
-	trihedrum.addIndex( 11 );
-
-	trihedrum.addIndex( 8 );
-	trihedrum.addIndex( 11 );
-	trihedrum.addIndex( 10 );
-
-	trihedrum.drawWireframe();
+		
+	drawTrihedrum();
 }
 //--------------------------------------------------------------
 void ofxSphericCamera::end(){    
@@ -425,4 +351,89 @@ void ofxSphericCamera::setCameraTeta( float theTeta ){
 //--------------------------------------------------------------
 void ofxSphericCamera::setCameraFi( float theFi ){
 	cameraFi = theFi;
+}
+//--------------------------------------------------------------
+void ofxSphericCamera::setDrawTrihedrum( bool haveToisDrawTrihedrum ){
+	isDrawingTrihedrum = haveToisDrawTrihedrum;
+}
+//--------------------------------------------------------------
+void ofxSphericCamera::drawTrihedrum(){
+	if( isDrawingTrihedrum ){
+		ofMesh trihedrum;
+		float side = 100;
+
+		//face xy
+		trihedrum.addVertex( ofVec3f( 0 , 0 , 0 ) );
+		trihedrum.addVertex( ofVec3f( side , 0 , 0 ) );
+		trihedrum.addVertex( ofVec3f( 0 , side , 0 ) );
+		trihedrum.addVertex( ofVec3f( side , side , 0 ) );
+	
+		trihedrum.addColor( ofColor( 0 , 0 , 0 ));
+		trihedrum.addColor( ofColor( 255 , 0 , 0 ));
+		trihedrum.addColor( ofColor( 0 , 255 , 0 ));
+		trihedrum.addColor( ofColor( 255 , 255 , 0 ));
+
+		trihedrum.addNormal( ofVec3f( 0 , 0 , 1 ) );
+		trihedrum.addNormal( ofVec3f( 0 , 0 , 1 ) );
+		trihedrum.addNormal( ofVec3f( 0 , 0 , 1 ) );
+		trihedrum.addNormal( ofVec3f( 0 , 0 , 1 ) );
+
+		trihedrum.addIndex( 0 );
+		trihedrum.addIndex( 1 );
+		trihedrum.addIndex( 3 );
+
+		trihedrum.addIndex( 0 );
+		trihedrum.addIndex( 3 );
+		trihedrum.addIndex( 2 );
+
+		//face YZ
+		trihedrum.addVertex( ofVec3f( 0 , 0 , 0 ) );
+		trihedrum.addVertex( ofVec3f( 0 , side , 0 ) );
+		trihedrum.addVertex( ofVec3f( 0 , 0 ,side ) );
+		trihedrum.addVertex( ofVec3f( 0 , side , side ) );
+	
+		trihedrum.addColor( ofColor( 0 , 0 , 0 ));
+		trihedrum.addColor( ofColor( 0 , 255 , 0 ));
+		trihedrum.addColor( ofColor( 0 , 0 , 255 ));
+		trihedrum.addColor( ofColor( 0 , 255 , 255 ));
+
+		trihedrum.addNormal( ofVec3f( 1 , 0 , 0 ) );
+		trihedrum.addNormal( ofVec3f( 1 , 0 , 0 ) );
+		trihedrum.addNormal( ofVec3f( 1 , 0 , 0 ) );
+		trihedrum.addNormal( ofVec3f( 1 , 0 , 0 ) );
+
+		trihedrum.addIndex( 4 );
+		trihedrum.addIndex( 5 );
+		trihedrum.addIndex( 7 );
+
+		trihedrum.addIndex( 4 );
+		trihedrum.addIndex( 7 );
+		trihedrum.addIndex( 6 );
+
+		//face XZ
+		trihedrum.addVertex( ofVec3f( 0 , 0 , 0 ) );
+		trihedrum.addVertex( ofVec3f( side , 0 , 0 ) );
+		trihedrum.addVertex( ofVec3f( 0 , 0 ,side ) );
+		trihedrum.addVertex( ofVec3f( side , 0 , side ) );
+	
+		trihedrum.addColor( ofColor( 0 , 0 , 0 ));
+		trihedrum.addColor( ofColor( 255 , 0 , 0 ));
+		trihedrum.addColor( ofColor( 0 , 0 , 255 ));
+		trihedrum.addColor( ofColor( 255 , 0 , 255 ));
+
+		trihedrum.addNormal( ofVec3f( 0 , 1 , 0 ) );
+		trihedrum.addNormal( ofVec3f( 0 , 1 , 0 ) );
+		trihedrum.addNormal( ofVec3f( 0 , 1 , 0 ) );
+		trihedrum.addNormal( ofVec3f( 0 , 1 , 0 ) );
+
+		trihedrum.addIndex( 8 );
+		trihedrum.addIndex( 9 );
+		trihedrum.addIndex( 11 );
+
+		trihedrum.addIndex( 8 );
+		trihedrum.addIndex( 11 );
+		trihedrum.addIndex( 10 );
+
+		trihedrum.drawWireframe();
+	}
 }
