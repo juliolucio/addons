@@ -45,20 +45,18 @@ void ofxFlyingCamera::setup( string theFileName ){
 	cameraTop		= cameraRight / cameraAspectRatio;
 	cameraBottom	= -cameraTop;
 
-	cameraDeltaRadius	= 0;
-	cameraDeltaTeta		= 0;
-	cameraDeltaFi		= 0;
+	cameraUp		= ofVec3f(0,0,-1);
 
-	cameraEye.x = cameraRadius * cos( cameraTeta * ( ( 2 * PI ) / 360.0f )) * sin( cameraFi * ( ( 2 * PI ) / 360.0f ) );
-	cameraEye.y = cameraRadius * sin( cameraTeta * ( ( 2 * PI ) / 360.0f )) * sin( cameraFi * ( ( 2 * PI ) / 360.0f ) );
-	cameraEye.z = cameraRadius * cos( cameraFi	 * ( ( 2 * PI ) / 360.0f ));
+	cameraCenter.x = cameraEye.x + cameraRadius * cos( cameraTeta * ( ( 2 * PI ) / 360.0f )) * sin( cameraFi * ( ( 2 * PI ) / 360.0f ) );
+	cameraCenter.y = cameraEye.y + cameraRadius * sin( cameraTeta * ( ( 2 * PI ) / 360.0f )) * sin( cameraFi * ( ( 2 * PI ) / 360.0f ) );
+	cameraCenter.z = cameraEye.z + cameraRadius * cos( cameraFi	* ( ( 2 * PI ) / 360.0f ));
 
-	haveToUpdateCamera = true;
+	cameraEyeCenterDirection = (cameraCenter - cameraEye).normalize();	haveToUpdateCamera = true;
 	isDrawingTrihedrum = false;
 }
 //---------------------------------------------------------------------------------------------------------
 string ofxFlyingCamera::load( string theFileName ){
-	string path = "cameras/";
+	std::string path = "cameras/";
 	fileName = path + theFileName;
 	fileName = ofToDataPath( fileName );
 	fileIn.open( fileName.c_str() , std::ios_base::binary | std::ios_base::in );
@@ -81,64 +79,33 @@ string ofxFlyingCamera::load( string theFileName ){
 	if( dataValueString == "0.1" ){
         
         fileIn >> dataName;
-		if( dataName != "cameraAngle=" ){
-			fileIn.close();
-			return "ofxFlyingCamera ERROR: Bad project Info file format loading cameraAngle\n";
-		}
-		fileIn >> cameraAngle;
-        
-        fileIn >> dataName;
-		if( dataName != "cameraFar=" ){
-			fileIn.close();
-			return "ofxFlyingCamera ERROR: Bad project Info file format loading cameraFar\n";
-		}
-		fileIn >> cameraFar;
-        
-        fileIn >> dataName;
-		if( dataName != "cameraNear=" ){
-			fileIn.close();
-			return "ofxFlyingCamera ERROR: Bad project Info file format loading cameraNear\n";
-		}
-		fileIn >> cameraNear;
-        
-        
-        fileIn >> dataName;
 		if( dataName != "cameraCenter=" ){
 			fileIn.close();
-			return "ofxFlyingCamera ERROR: Bad project Info file format loading cameraCenter\n";
+			return "ofxSAREnviroment ERROR: Bad project Info file format loading cameraCenter\n";
 		}
+
 		fileIn >> cameraCenter.x;
 		fileIn >> cameraCenter.y;
 		fileIn >> cameraCenter.z;
 
 		fileIn >> dataName;
-		if( dataName != "cameraUp=" ){
-			fileIn.close();
-			return "ofxFlyingCamera ERROR: Bad project Info file format loading cameraUp\n";
-		}
-
-		fileIn >> cameraUp.x;
-		fileIn >> cameraUp.y;
-		fileIn >> cameraUp.z;
-
-		fileIn >> dataName;
 		if( dataName != "cameraRadius=" ){
 			fileIn.close();
-			return "ofxFlyingCamera ERROR: Bad project Info file format loading cameraRadius\n";
+			return "ofxSAREnviroment ERROR: Bad project Info file format loading cameraRadius\n";
 		}
 		fileIn >> cameraRadius;
-        
-        fileIn >> dataName;
+
+		fileIn >> dataName;
 		if( dataName != "cameraTeta=" ){
 			fileIn.close();
-			return "ofxFlyingCamera ERROR: Bad project Info file format loading cameraTeta\n";
+			return "ofxSAREnviroment ERROR: Bad project Info file format loading cameraTeta\n";
 		}
 		fileIn >> cameraTeta;
-        
-        fileIn >> dataName;
+
+		fileIn >> dataName;
 		if( dataName != "cameraFi=" ){
 			fileIn.close();
-			return "ofxFlyingCamera ERROR: Bad project Info file format loading cameraFi\n";
+			return "ofxSAREnviroment ERROR: Bad project Info file format loading cameraFi\n";
 		}
 		fileIn >> cameraFi;
 
@@ -166,19 +133,7 @@ string ofxFlyingCamera::save(  string theFileName  ){
 	fileOut << FILE_VERSION;
 	fileOut << "\n";
         
-	fileOut << "cameraAngle=\t ";
-	fileOut << cameraAngle;
-	fileOut << "\n";	
-    
-	fileOut << "cameraFar=\t ";
-	fileOut << cameraFar;
-	fileOut << "\n";	
-    
-	fileOut << "cameraNear=\t ";
-	fileOut << cameraNear;
-	fileOut << "\n";	
-   
-	fileOut << "cameraCenter=\t ";
+	fileOut << "cameraCenter=\n ";
 	fileOut << cameraCenter.x;
 	fileOut << "\t";
 	fileOut << cameraCenter.y;
@@ -186,59 +141,31 @@ string ofxFlyingCamera::save(  string theFileName  ){
 	fileOut << cameraCenter.z;
 	fileOut << "\n";
 		
-	fileOut << "cameraEye=\t ";
-	fileOut << cameraEye.x;
-	fileOut << "\t";
-	fileOut << cameraEye.y;
-	fileOut << "\t";
-	fileOut << cameraEye.z;
-	fileOut << "\n";
-		
-	fileOut << "cameraRadius=\t ";
+	fileOut << "cameraRadius=\n ";
 	fileOut << cameraRadius;
 	fileOut << "\n";
-
-	fileOut << "cameraTeta=\t ";
+			
+	fileOut << "cameraTeta=\n ";
 	fileOut << cameraTeta;
-	fileOut << "\n";	
-    
-	fileOut << "cameraFi=\t ";
+	fileOut << "\n";
+			
+	fileOut << "cameraFi=\n ";
 	fileOut << cameraFi;
-	fileOut << "\n";	
+	fileOut << "\n";
     
-	
 	fileOut.close();
 	return "ok";
 }
 //--------------------------------------------------------------
 void ofxFlyingCamera::update(){		
 	if( haveToUpdateCamera ){
-		cameraRadius	+= cameraDeltaRadius;
-		cameraTeta		+= cameraDeltaTeta;
-		cameraFi		+= cameraDeltaFi;
-		
-		//clamping
-		if( cameraRadius > 1000 ) 
-			cameraRadius = 1000;
-		if( cameraRadius <= 10 * cameraNear ) 
-			cameraRadius = 10 * cameraNear;
-		if( cameraTeta > 360 )
-			cameraTeta = 0;
-		if( cameraTeta < 0 )
-			cameraTeta= 360;
-		if( cameraFi >= 180 )
-			cameraFi = 180;
-		if( cameraFi <= 0.00001 )
-			cameraFi = 0.00001;		
+		cameraCenter.x = cameraEye.x + cameraRadius * cos( cameraTeta * ( ( 2 * PI ) / 360.0f )) * sin( cameraFi * ( ( 2 * PI ) / 360.0f ) );
+		cameraCenter.y = cameraEye.y + cameraRadius * sin( cameraTeta * ( ( 2 * PI ) / 360.0f )) * sin( cameraFi * ( ( 2 * PI ) / 360.0f ) );
+		cameraCenter.z = cameraEye.z + cameraRadius * cos( cameraFi	* ( ( 2 * PI ) / 360.0f ));
 
-		cameraEye.x = cameraRadius * cos( cameraTeta * ( ( 2 * PI ) / 360.0f )) * sin( cameraFi * ( ( 2 * PI ) / 360.0f ) );
-		cameraEye.y = cameraRadius * sin( cameraTeta * ( ( 2 * PI ) / 360.0f )) * sin( cameraFi * ( ( 2 * PI ) / 360.0f ) );
-		cameraEye.z = cameraRadius * cos( cameraFi	 * ( ( 2 * PI ) / 360.0f ));
+		cameraEyeCenterDirection = (cameraCenter - cameraEye).normalize();
 
 		haveToUpdateCamera = false;
-		cameraDeltaRadius = 0;
-		cameraDeltaTeta = 0;
-		cameraDeltaFi = 0;
 		
 		//apllying frustrum
 		glMatrixMode(GL_PROJECTION);
@@ -257,15 +184,15 @@ void ofxFlyingCamera::begin(){
 	frameBufferCamera->begin();	
     
     //binding shader
-	//shaderTexturing.begin();
-    shaderColor.begin();
+	shaderTexturing.begin();
+    //shaderColor.begin();
 
-   /* glGetError();
+    glGetError();
     glUniform1i( uniformParamIndexModelTexture , 0 );
     GLint error =  glGetError();
     if(error )
         printf( "** ERROR: Setting param modekl texture in shader texturing\n");
-    */
+    
     
     //setting GL state
     glDepthMask(GL_TRUE);
@@ -295,15 +222,14 @@ void ofxFlyingCamera::end(){
 	//finishing frame buffer draw
 	frameBufferCamera->end();
 
-	ofSetColor( 255 , 255, 255 );
-
+	ofSetHexColor( 0xffffff );
 	glDepthMask(GL_FALSE);
 	glDisable(GL_DEPTH_TEST);	
 }
 //--------------------------------------------------------------
 void ofxFlyingCamera::draw( int x , int y , int width , int height ){ 
 	
-	ofSetColor( 0x555555 );
+	ofSetHexColor( 0x555555 );
 	if( width >= height ){
 		ofRect( x - 5 , y - 5 , width + 10 , width + 10 );
 		frameBufferCamera->draw( x , y , width , width );
@@ -314,19 +240,28 @@ void ofxFlyingCamera::draw( int x , int y , int width , int height ){
 	}
 }
 //--------------------------------------------------------------
-void ofxFlyingCamera::setDeltaCameraSphericalCoordinatesRadius( float theDeltaRadius ){
-	cameraDeltaRadius	= theDeltaRadius;
-	haveToUpdateCamera	= true;
+void ofxFlyingCamera::setDeltaCameraSphericalCoordinatesGoForward	( float theDeltaDistance ){
+
 }
 //--------------------------------------------------------------
-void ofxFlyingCamera::setDeltaCameraSphericalCoordinatesTeta( float theDeltaTeta ){
-	cameraDeltaTeta		= theDeltaTeta;
-	haveToUpdateCamera	= true;
+void ofxFlyingCamera::setDeltaCameraSphericalCoordinatesGoBackward	( float theDeltaDistance ){
+
 }
 //--------------------------------------------------------------
-void ofxFlyingCamera::setDeltaCameraSphericalCoordinatesFi( float theDeltaFi ){
-	cameraDeltaFi		= theDeltaFi;
-	haveToUpdateCamera	= true;
+void ofxFlyingCamera::setDeltaCameraSphericalCoordinatesOrbitLef	( float theDeltaAngle ){
+
+}
+//--------------------------------------------------------------
+void ofxFlyingCamera::setDeltaCameraSphericalCoordinatesOrbitRight( float theDeltaAngle ){
+
+}
+//--------------------------------------------------------------
+void ofxFlyingCamera::setDeltaCameraSphericalCoordinatesOrbitUp	( float theDeltaAngle ){
+
+}
+//--------------------------------------------------------------
+void ofxFlyingCamera::setDeltaCameraSphericalCoordinatesOrbitDown	( float theDeltaAngle ){
+
 }
 //--------------------------------------------------------------
 float ofxFlyingCamera::getCameraRadius( ){

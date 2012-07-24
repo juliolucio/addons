@@ -16,14 +16,7 @@ private:
 	ofVec3f						cameraCenter;
 	ofVec3f						cameraEye;
 	ofVec3f						cameraUp;
-    
-    float						cameraRadius;
-	float						cameraTeta;
-	float						cameraFi;
-
-	float						cameraDeltaRadius;
-	float						cameraDeltaTeta;
-	float						cameraDeltaFi;
+	ofVec3f						cameraEyeCenterDirection;
 
 	float						cameraAngle;
 	float						cameraAspectRatio;
@@ -35,6 +28,10 @@ private:
 	float						cameraRight;
 	float						cameraTop;
 	float						cameraBottom;
+
+	float						cameraRadius;
+	float						cameraTeta;
+	float						cameraFi;
 
 	bool						haveToUpdateCamera;
 	bool						isDrawingTrihedrum;
@@ -78,9 +75,14 @@ public:
 
 	void						setDrawTrihedrum		( bool haveToisDrawTrihedrum );
      
-	void						setDeltaCameraSphericalCoordinatesRadius( float theDeltaRadius );
-	void						setDeltaCameraSphericalCoordinatesTeta	( float theDeltaTeta );
-	void						setDeltaCameraSphericalCoordinatesFi	( float theDeltaFi );
+	void						drawCameraView							( int x , int y , int width , int height );
+	
+	void						setDeltaCameraSphericalCoordinatesGoBackward( float theDeltaRadius );
+	void						setDeltaCameraSphericalCoordinatesGoForward	( float theDistance );
+	void						setDeltaCameraSphericalCoordinatesOrbitLef	( float theDistance );
+	void						setDeltaCameraSphericalCoordinatesOrbitRight( float theDeltaAngle );
+	void						setDeltaCameraSphericalCoordinatesOrbitUp	( float theDeltaAngle );
+	void						setDeltaCameraSphericalCoordinatesOrbitDown	( float theDeltaAngle );
 	
 };
 
